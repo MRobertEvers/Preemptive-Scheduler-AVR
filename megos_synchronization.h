@@ -11,6 +11,8 @@
 
 typedef int* semaphore;
 
+static void sem_block_if_neg(semaphore sem);
+
 /*
 * megos_new_sem(usnigned int)
 *

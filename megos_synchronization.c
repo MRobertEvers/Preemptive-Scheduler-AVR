@@ -20,10 +20,28 @@
 #include <util/atomic.h>
 #define MAX_SEMAPHORES 10
 
+static void sem_block_if_neg(semaphore sem)
+{
+   while(1)
+   {
+      cli();
+      if(*sem >= 0)
+      {
+         // We don't need to enabled interrupts here.
+         // The outer function MUST enable interrupts if
+         // desired.
+         break;
+      }
+      // Interrupts MUST be enabled here.
+      // If we are blocking, then interrupts are the
+      // only way out of this loop.
+      sei();
+   }
+}
+
 // TODO: Avoid static allocation
 static int semaphores[MAX_SEMAPHORES];
 static unsigned int current_sem = 0;
-
 int* megos_new_sem(unsigned int sem_val)
 {
 	semaphores[current_sem] = sem_val;
@@ -53,9 +71,9 @@ void megos_sem_V(semaphore sem)
 
 void megos_sem_P(semaphore sem)
 {
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-	{
-		*sem--;
-		while(*sem < 0);
-	}
+   ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+   {
+      *sem--;
+      sem_block_if_neg(sem);
+   }
 }

@@ -31,53 +31,52 @@ static void sched_timer_enable(void)
 
 void megos_sched_timer_set(int aiMilliseconds)
 {
-   ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-   {
-      sched_timer_enable();
-      sched_timer_enable_CTC();
+   cli();
+   sched_timer_enable();
+   sched_timer_enable_CTC();
    
-      long iTicks = CLOCK_TICKS_PER_MS * aiMilliseconds;
+   long iTicks = CLOCK_TICKS_PER_MS * aiMilliseconds;
 
-      // Clear the Pre-Scaler bits. See atmel manual 19.9.2
-      TCCR0B &= (0xF8);
+   // Clear the Pre-Scaler bits. See atmel manual 19.9.2
+   TCCR0B &= (0xF8);
    
-      if(iTicks < 256)
-      {
-         // Set Pre-scaler to 1
-         TCCR0B |= (1 << CS00);
-      }
-      else if( iTicks / 8 < 256 )
-      {
-         // Set Pre-scaler to 8
-         TCCR0B |= (1 << CS01);
-         iTicks /= 8;
-      }
-      else if( iTicks / 64 < 256 )
-      {
-         // Set Pre-scaler to 64
-         TCCR0B |= (1 << CS00);
-         TCCR0B |= (1 << CS01);
-         iTicks /= 64;
-      }
-      else if( iTicks / 256 < 256 )
-      {
-         // Set Pre-scaler to 256
-         TCCR0B |= (1 << CS02);
-         iTicks /= 256;
-      }
-      else if( iTicks / 1024 < 256 )
-      {
-         // Set Pre-scaler to 1024
-         TCCR0B |= (1 << CS00);
-         TCCR0B |= (1 << CS02);
-         iTicks /= 1024;
-      }
-      else
-      {
-         // Cant do it.
-      }
-   
-      // Now set the compare value to iMinResolution
-      sched_timer_set_ticks(iTicks & 0xFF);
+   if(iTicks < 256)
+   {
+      // Set Pre-scaler to 1
+      TCCR0B |= (1 << CS00);
    }
+   else if( iTicks / 8 < 256 )
+   {
+      // Set Pre-scaler to 8
+      TCCR0B |= (1 << CS01);
+      iTicks /= 8;
+   }
+   else if( iTicks / 64 < 256 )
+   {
+      // Set Pre-scaler to 64
+      TCCR0B |= (1 << CS00);
+      TCCR0B |= (1 << CS01);
+      iTicks /= 64;
+   }
+   else if( iTicks / 256 < 256 )
+   {
+      // Set Pre-scaler to 256
+      TCCR0B |= (1 << CS02);
+      iTicks /= 256;
+   }
+   else if( iTicks / 1024 < 256 )
+   {
+      // Set Pre-scaler to 1024
+      TCCR0B |= (1 << CS00);
+      TCCR0B |= (1 << CS02);
+      iTicks /= 1024;
+   }
+   else
+   {
+      // Cant do it.
+   }
+   
+   // Now set the compare value to iMinResolution
+   sched_timer_set_ticks(iTicks & 0xFF);
+   sei();
 }
