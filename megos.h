@@ -9,6 +9,11 @@
 #ifndef MEGOS_H_
 #define MEGOS_H_
 
+/*
+* megos_init(void)
+*
+* Performs the necessary settings to initialize megos.
+*/
 void megos_init(void);
 
 

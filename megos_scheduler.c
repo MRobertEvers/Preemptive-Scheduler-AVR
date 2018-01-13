@@ -7,6 +7,7 @@
 
  #include <avr/io.h>
  #include <avr/interrupt.h>
+ #include <util/atomic.h>
  #include "megos_scheduler.h"
  #include "atmel328P.h"
 
@@ -145,14 +146,18 @@
 
  static void scheduler_cleanup_tasks(void)
  {
-	cli();
-	struct mos_tcb* next_task = (&tcb_main)->next_task;
-	while(next_task)
+	// Interrupts cannot occur here because the task states are undetermined
+	// while this is running..
+	// TODO: Perhaps only loop a fixed number of times to minimize blocking time.
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		next_task->next_task = scheduler_task_clean_child(next_task->next_task);
-		next_task = next_task->next_task;
+		struct mos_tcb* next_task = (&tcb_main)->next_task;
+		while(next_task)
+		{
+			next_task->next_task = scheduler_task_clean_child(next_task->next_task);
+			next_task = next_task->next_task;
+		}
 	}
-	sei();
  }
 
  static void scheduler_context_switch(void** current_context_sp, void** next_context_sp)
@@ -164,25 +169,27 @@
 
  unsigned int megos_new_task(mos_task_fn aptTask, unsigned int aiSize)
  {
-	cli();
-	void* memory_block = scheduler_allocate_task_memory(aiSize);
-	scheduler_initialize_tcb(memory_block, aptTask, aiSize);
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		void* memory_block = scheduler_allocate_task_memory(aiSize);
+		scheduler_initialize_tcb(memory_block, aptTask, aiSize);
+	}
 	// TODO: Assign IDs.
-	sei();
 	return 1;
  }
 
  void megos_schedule()
  {
-	cli();
-	struct mos_tcb* next_task = scheduler_next_ready_task(current_task);
-
-	if(next_task != current_task)
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		void** curr_sp = &current_task->stack_pointer;
-		void** next_sp = &next_task->stack_pointer;
-		current_task = next_task;
-		scheduler_context_switch(curr_sp, next_sp);
+		struct mos_tcb* next_task = scheduler_next_ready_task(current_task);
+
+		if(next_task != current_task)
+		{
+			void** curr_sp = &current_task->stack_pointer;
+			void** next_sp = &next_task->stack_pointer;
+			current_task = next_task;
+			scheduler_context_switch(curr_sp, next_sp);
+		}
 	}
-	sei();
  }
