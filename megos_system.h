@@ -62,6 +62,8 @@ static void sched_timer_enable(void);
 *        interrupts from timer 0. (Other than define the interrupt). This
 *        function also sets the prescaling value.
 */
-void megos_sched_timer_set(int aiMilliseconds);
+void megos_sched_timer_set(unsigned int aiMilliseconds);
+
+unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds);
 
 #endif /* MEGOS_SYSTEM_H_ */

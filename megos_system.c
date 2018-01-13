@@ -8,6 +8,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+// Track what we set the prescale to for convenience.
+static unsigned int system_rate;
+
 static void sched_timer_enable_CTC(void)
 {
    // Set timer to CTC Mode. See atmel manual 19.9.1
@@ -29,13 +32,14 @@ static void sched_timer_enable(void)
    TIMSK0 |= (1 << OCIE0A);
 }
 
-void megos_sched_timer_set(int aiMilliseconds)
+void megos_sched_timer_set(unsigned int aiMilliseconds)
 {
    cli();
    sched_timer_enable();
    sched_timer_enable_CTC();
    
-   long iTicks = CLOCK_TICKS_PER_MS * aiMilliseconds;
+   system_rate = aiMilliseconds;
+   int iTicks = CLOCK_TICKS_PER_MS * aiMilliseconds;
 
    // Clear the Pre-Scaler bits. See atmel manual 19.9.2
    TCCR0B &= (0xF8);
@@ -75,8 +79,13 @@ void megos_sched_timer_set(int aiMilliseconds)
    {
       // Cant do it.
    }
-   
-   // Now set the compare value to iMinResolution
+
    sched_timer_set_ticks(iTicks & 0xFF);
    sei();
+}
+
+
+unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds)
+{
+   return aiMilliseconds / system_rate;
 }

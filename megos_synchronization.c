@@ -18,10 +18,13 @@
  * header, this special function restores the sreg state.
  */
 #include <util/atomic.h>
+#include "megos_synchronization.h"
 #define MAX_SEMAPHORES 10
 
-static void sem_block_if_neg(semaphore sem)
+static inline void sem_block_if_neg(semaphore sem)
 {
+   // Interrupts must have already been disabled,
+   // otherwise 2 sems could decrement, then compare and both fail.
    while(1)
    {
       cli();

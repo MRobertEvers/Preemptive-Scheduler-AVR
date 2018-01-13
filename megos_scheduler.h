@@ -16,6 +16,7 @@ static enum mos_task_status
 	TASK_READY = 0x1,
 	TASK_WAIT = 0x2,
 	TASK_DONE = 0x4,
+   TASK_SLEEP = 0x8,
 	TASK_INIT = 0x0
 };
 
@@ -25,6 +26,7 @@ static struct mos_tcb
 	struct mos_tcb* next_task;
 	void* memory_end;
 	unsigned int task_id;
+   unsigned long sleep_tick_count;
 	enum mos_task_status status;
 };
 
@@ -164,6 +166,8 @@ static void scheduler_cleanup_tasks(void);
 */
 static void scheduler_context_switch(void** current_context, void** next_context);
 
+static void scheduler_wake_sleeping_tasks_if_time();
+
 /*
 * megos_new_task(mos_task_fn , unsigned int)
 * 
@@ -178,10 +182,18 @@ static void scheduler_context_switch(void** current_context, void** next_context
 unsigned int megos_new_task(mos_task_fn aptTask, unsigned int aiSize);
 
 /*
+* megos_task_sleep(unsigned int)
+*
+*/
+void megos_task_sleep(unsigned int aiMilliseconds);
+
+/*
 * megos_schedule(void)
 *
 * Determines the next task to be run and performs the context switch.
 */
-void megos_schedule(void);
+void megos_schedule(unsigned char abIsInterrupt);
+
+void megos_schedule_control_init(void);
 
 #endif /* MEGOS_SCHEDULER_H_ */
