@@ -134,6 +134,28 @@ static void* scheduler_allocate_task_memory(unsigned int aiSize);
 static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask);
 
 /*
+* scheduler_find_task(unsigned int, struct mos_tcb**)
+*
+* Tries to find the task with the input ID. If successful, the task is returned
+* in the rStruct.
+*
+* @Param aiTask: Task to find.
+* @Param rStruct: Return value if successful.
+* @Return: 1 if successful, 0 otherwise.
+*/
+static unsigned char scheduler_find_task(unsigned int aiTask, struct mos_tcb** rStruct);
+
+/*
+* scheduler_task_wakeup(unsigned int)
+*
+* Changes the state of the input task to READY and removes any
+* sleep time. Only does this if the task is either WAITING or SLEEPING
+*
+* @Param aiTask: Task to wake.
+*/
+static void scheduler_task_wakeup(unsigned int aiTask);
+
+/*
 * scheduler_task_exit(void)
 *
 * Wrapper function for all created tasks. When the entry point function
@@ -166,7 +188,13 @@ static void scheduler_cleanup_tasks(void);
 */
 static void scheduler_context_switch(void** current_context, void** next_context);
 
-static void scheduler_wake_sleeping_tasks_if_time();
+/*
+* scheduler_wake_sleeping_tasks_if_time(void)
+*
+* Checks all the tasks and decrements their sleep time.
+* If a sleep time is 0, then it wakes the task.
+*/
+static void scheduler_wake_sleeping_tasks_if_time(void);
 
 /*
 * megos_new_task(mos_task_fn , unsigned int)
@@ -182,6 +210,15 @@ static void scheduler_wake_sleeping_tasks_if_time();
 unsigned int megos_new_task(mos_task_fn aptTask, unsigned int aiSize);
 
 /*
+* megos_task_start(unsigned int)
+*
+* Changes the state of the input task from INIT to READY.
+*
+* @Param aiTask: Task ID of task to start. Must be in INIT or this does nothing.
+*/
+void megos_task_start(unsigned int aiTask);
+
+/*
 * megos_task_sleep(unsigned int)
 *
 */
@@ -194,6 +231,12 @@ void megos_task_sleep(unsigned int aiMilliseconds);
 */
 void megos_schedule(unsigned char abIsInterrupt);
 
+/*
+* megos_schedule_control_init(void)
+*
+* Turns on the process that cleans up other processes. 
+* This process should only be called when another process reaches complete.
+*/
 void megos_schedule_control_init(void);
 
 #endif /* MEGOS_SCHEDULER_H_ */

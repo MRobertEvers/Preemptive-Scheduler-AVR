@@ -27,7 +27,8 @@ void test_task(void)
 int main(void)
 {
    megos_init();
-   megos_new_task(&test_task, SCHEDULER_DEFAULT_TASK_SIZE);
+   int i = megos_new_task(&test_task, SCHEDULER_DEFAULT_TASK_SIZE);
+   megos_task_start(i);
    /* Replace with your application code */
    while (1)
    {
