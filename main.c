@@ -14,13 +14,35 @@
 static int test_int = 0;
 void test_task(void)
 {
+   DDRD |= 0x7C;
+   unsigned char bit = 1;
    while(1)
    {
-      DDRB |= (test_int << PORTB5);
-      PORTB &= !(test_int << PORTB5);
-      PORTB |= (test_int << PORTB5);
-      test_int = !test_int;
-      megos_task_sleep(1000);
+      PORTD &= !(bit << PORTD2);
+      PORTD |= (bit << PORTD2);
+      bit = bit << 1;
+      if(bit > (1 << 4 << PORTD2))
+      {
+         bit = 1;
+      }
+      megos_task_sleep(500);
+   }
+}
+
+void test_task_two(void)
+{
+   DDRB |= 0x7C;
+   unsigned char bit = 1;
+   while(1)
+   {
+      PORTB &= !(bit << PORTB2);
+      PORTB |= (bit << PORTB2);
+      bit = bit << 1;
+      if(bit > (1 << 4 << PORTB2))
+      {
+         bit = 1;
+      }
+      megos_task_sleep(500);
    }
 }
 
@@ -28,6 +50,9 @@ int main(void)
 {
    megos_init();
    int i = megos_new_task(&test_task, SCHEDULER_DEFAULT_TASK_SIZE);
+   megos_task_start(i);
+
+   i = megos_new_task(&test_task_two, SCHEDULER_DEFAULT_TASK_SIZE);
    megos_task_start(i);
    /* Replace with your application code */
    while (1)
