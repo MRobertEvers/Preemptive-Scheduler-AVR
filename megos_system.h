@@ -12,43 +12,6 @@
 #define CLOCK_FREQUENCY 20000000
 #define CLOCK_TICKS_PER_MS CLOCK_FREQUENCY/1000
 
-/* 
-* sched_timer_enable_CTC(void)
-*
-* Sets the appropriate registers to enable CTC mode on timer 0.
-*
-* Notes: See ATmega328P manual 19.9.1.
-*        Bit WGM01 of the TCCR0A register is the flag to enable CTC mode.
-*/
-static void sched_timer_enable_CTC(void);
-
-/*
-* sched_timer_set_ticks(unsigned char)
-*
-* Sets the number of 'ticks' between each interrupt interval
-* for timer 0.
-* 
-* @Param aiTicks: Ticks between interrupts.
-*
-* Notes: See Atmega328P manual 19.9.6.
-*        The highest 'tick' value between interrupts is 255.
-*        The register that stores the value is OCR0A.
-*        Whenever, the timer counter matches the value in OCR0A, the interrupt
-*        will flag. If a longer time period is needed than provided by 255 ticks,
-*        look into prescaling the timer 'ticks'. See megos_sched_timer_set.
-*/
-static void sched_timer_set_ticks(unsigned char aiTicks);
-
-/*
-* sched_timer_enable(void)
-* 
-* Enables the interrupts for CTC mode (comparing with register OCR0A).
-*
-* Notes: See Atmega328P manual 19.9.x
-*        This flag is the OCIE0A bit of the TIMSK0 register.
-*/
-static void sched_timer_enable(void);
-
 /**
 * megos_sched_timer_set(int)
 * 

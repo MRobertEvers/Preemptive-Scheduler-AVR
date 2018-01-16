@@ -58,7 +58,8 @@ void megos_del_sem(semaphore sem)
 		int* ptr = sem;
 		while(ptr < semaphores+current_sem)
 		{
-			*ptr = *(++ptr);
+			*ptr = *(ptr+1);
+         ptr++;
 		}
 		current_sem--;
 	}
@@ -68,7 +69,7 @@ void megos_sem_V(semaphore sem)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		*sem++;
+		(*sem)++;
 	}
 }
 
@@ -76,7 +77,7 @@ void megos_sem_P(semaphore sem)
 {
    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
    {
-      *sem--;
+      (*sem)--;
       sem_block_if_neg(sem);
    }
 }
