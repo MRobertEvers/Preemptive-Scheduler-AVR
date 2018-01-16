@@ -12,4 +12,5 @@
  void megos_init()
  {
 	megos_sched_timer_set(1);
+	megos_schedule_control_init();
  }

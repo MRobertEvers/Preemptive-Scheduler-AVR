@@ -278,3 +278,9 @@ void megos_schedule(unsigned char abIsInterrupt)
       }
    }
 }
+
+void megos_schedule_control_init(void)
+{
+   cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
+   megos_task_start(cleanup_task);
+}
