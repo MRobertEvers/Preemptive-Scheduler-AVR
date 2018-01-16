@@ -231,12 +231,4 @@ void megos_task_sleep(unsigned int aiMilliseconds);
 */
 void megos_schedule(unsigned char abIsInterrupt);
 
-/*
-* megos_schedule_control_init(void)
-*
-* Turns on the process that cleans up other processes. 
-* This process should only be called when another process reaches complete.
-*/
-void megos_schedule_control_init(void);
-
 #endif /* MEGOS_SCHEDULER_H_ */
