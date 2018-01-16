@@ -99,12 +99,12 @@ static struct mos_tcb* scheduler_initialize_tcb(void* aptMemoryStart, mos_task_f
 
    // Point the stack pointer to the highest memory value in the block. The stack grows down.
    tcb->stack_pointer = aptMemoryStart + scheduler_calc_task_mem_size(aiSize);
-   tcb->status = TASK_INIT; // TODO: Set to init.
+   tcb->status = TASK_INIT;
    tcb->next_task = 0;
    tcb->task_id = task_id_pool++;
    tcb->memory_end = tcb->stack_pointer;
 
-   // Queue up.
+   // Get the last task in the queue. This comes after that.
    scheduler_get_head_task()->next_task = tcb;
 
    scheduler_initialize_stack(tcb, aptTask);
@@ -122,16 +122,14 @@ static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask)
 {
    // This is round robin style selection.
    struct mos_tcb* next = apStartTask->next_task;
+   while(next && next->status != TASK_READY)
+   {
+      next = next->next_task;
+   }
+
    if(next)
    {
-      if(next->status == TASK_READY)
-      {
-         return next;
-      }
-      else
-      {
-         return scheduler_next_ready_task(next);
-      }
+      return next;
    }
    else
    {
@@ -188,22 +186,16 @@ static void scheduler_task_exit(void)
 
 static void scheduler_cleanup_tasks(void)
 {
-   // Interrupts cannot occur here because the task states are undetermined
-   // while this is running..
-   // TODO: Perhaps only loop a fixed number of times to minimize blocking time.
-   while(1)
+   ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
    {
-      ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+      // TCB main should never be done until end of execution
+      struct mos_tcb* next = &tcb_main;
+      while(next)
       {
-         // TCB main should never be done until end of execution
-         struct mos_tcb* next = &tcb_main;
-         while(next)
-         {
-            next->next_task = scheduler_task_clean_child(next->next_task);
-            next = next->next_task;
-         }
-         megos_task_sleep(USHRT_MAX);
+         next->next_task = scheduler_task_clean_child(next->next_task);
+         next = next->next_task;
       }
+      megos_task_sleep(USHRT_MAX);
    }
 }
 
