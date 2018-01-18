@@ -21,7 +21,12 @@
  static int* buffer_sem = 0;
  static int* write_buffer_sem = 0;
  static int* stop_starve_sem = 0;
-
+ 
+ /*
+ * driver_8led_flip(void)
+ * 
+ * Flips the double buffer to update the display.
+ */
  static void driver_8led_flip(void);
 
   /*
@@ -32,7 +37,23 @@
  * Requires RCLK and SRCLK to be jumpered and on Port B; PORTB4
  */
  static void driver_8led_draw(void);
+
+ /*
+ * driver_8led_start_sweep(void)
+ * 
+ * Starts the shift register. Each shift after this will
+ * shift the register one notch.
+ *
+ * Note: This register exists in the configuration required to use this
+ * driver. It must be present for this driver to work.
+ */
  static void driver_8led_start_sweep(void);
+
+ /*
+ * driver_8led_shift(void)
+ *
+ * Cycles the shift register clock. Shifts each bit in the register.
+ */
  static void driver_8led_shift(void);
 
  static void driver_8led_flip(void)

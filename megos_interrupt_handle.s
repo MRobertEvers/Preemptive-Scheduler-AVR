@@ -47,6 +47,7 @@
    ldi r25, 0
    ldi r24, 1
    call megos_schedule
+   ; Restore the registers that may have been clobbered in the interrupt.
    pop r0
 	pop r1
 	pop r2

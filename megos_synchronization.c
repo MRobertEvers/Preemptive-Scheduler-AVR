@@ -21,6 +21,10 @@
 #include "megos_synchronization.h"
 #define MAX_SEMAPHORES 10
 
+// TODO: Avoid static allocation
+static int semaphores[MAX_SEMAPHORES];
+static unsigned int current_sem = 0;
+
 /*
 * sem_block_if_neg(semaphore)
 *
@@ -62,9 +66,6 @@ static void sem_block_if_empty(semaphore sem)
    }
 }
 
-// TODO: Avoid static allocation
-static int semaphores[MAX_SEMAPHORES];
-static unsigned int current_sem = 0;
 int* megos_new_sem(unsigned int sem_val)
 {
 	semaphores[current_sem] = sem_val;

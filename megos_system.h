@@ -28,9 +28,25 @@
 */
 void megos_sched_timer_set(unsigned int aiMilliseconds);
 
-
+/**
+* megos_delay_ns(unsigned int)
+*
+* More granular delay. Despite 'ns' this does not actually achieve 
+* that resolution.
+*
+* @Param nanosecond: Interval to delay. Time scale not known.
+*
+*/
 void megos_delay_ns(unsigned int nanoseconds);
 
+/**
+* megos_millis_get_ticks(unsigned int)
+*
+* Calculates the number of ticks in the input milliseconds.
+*
+* @Param aiMilliseconds: Interval to delay. Time scale not known.
+*
+*/
 unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds);
 
 #endif /* MEGOS_SYSTEM_H_ */

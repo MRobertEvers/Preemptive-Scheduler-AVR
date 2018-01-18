@@ -329,8 +329,8 @@ static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask)
 
 static unsigned char scheduler_find_task(unsigned int aiTask, struct mos_tcb** rStruct)
 {
-   struct mos_tcb** parent = 0;
-   return scheduler_find_task_with_parent(aiTask, rStruct, parent);
+   struct mos_tcb* parent = 0;
+   return scheduler_find_task_with_parent(aiTask, rStruct, &parent);
 }
 
 static unsigned char scheduler_find_task_with_parent( unsigned int aiTask,
@@ -495,6 +495,6 @@ void megos_schedule(unsigned char abIsInterrupt)
 
 void megos_schedule_control_init(void)
 {
-   cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
-   megos_task_start(cleanup_task);
+   //cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
+   //megos_task_start(cleanup_task);
 }
