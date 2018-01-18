@@ -9,6 +9,7 @@
  #include "megos_scheduler.h"
  #include "megos_synchronization.h"
  #include "megos_settings.h"
+ #include "megos_system.h"
  #include "megos_8led_driver.h"
 
  // Since a char is 8 bits long, we can do an array of 8 chars.

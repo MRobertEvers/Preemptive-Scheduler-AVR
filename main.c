@@ -13,7 +13,6 @@
 #include "megos_scheduler.h"
 #include "megos_settings.h"
 
-
 int main(void)
 {
    megos_init();
@@ -26,6 +25,8 @@ int main(void)
       }
       megos_8led_draw_refresh();
    }
+
+   while (1);
 }
 
 // Create the ISR for the scheduler.

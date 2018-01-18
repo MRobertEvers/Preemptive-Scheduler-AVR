@@ -20,7 +20,6 @@ enum mos_task_status
    TASK_WAIT = 0x2,
    TASK_DONE = 0x4,
    TASK_SLEEP = 0x8,
-   TASK_SEMAPHORE = 0x10,
    TASK_INIT = 0x0
 };
 
@@ -330,7 +329,7 @@ static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask)
 
 static unsigned char scheduler_find_task(unsigned int aiTask, struct mos_tcb** rStruct)
 {
-   struct mos_tcb* parent;
+   struct mos_tcb** parent = 0;
    return scheduler_find_task_with_parent(aiTask, rStruct, parent);
 }
 
@@ -496,6 +495,6 @@ void megos_schedule(unsigned char abIsInterrupt)
 
 void megos_schedule_control_init(void)
 {
-   //cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
-   //megos_task_start(cleanup_task);
+   cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
+   megos_task_start(cleanup_task);
 }

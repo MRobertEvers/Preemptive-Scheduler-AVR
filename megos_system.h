@@ -29,7 +29,7 @@
 void megos_sched_timer_set(unsigned int aiMilliseconds);
 
 
-inline void megos_delay_ns(unsigned int nanoseconds);
+void megos_delay_ns(unsigned int nanoseconds);
 
 unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds);
 

@@ -12,22 +12,6 @@
 typedef signed int* semaphore;
 
 /*
-* sem_block_if_neg(semaphore)
-* 
-* If the semaphore is non-negative, this function will simply return.
-* If the semaphore is negative, this will block and enable interrupts.
-* Interrupts are guaranteed to be disabled upon return from this function.
-*
-* @Param sem: Semaphore to test if should block.
-*
-* Preconditions: In order for this to block properly, interrupts must be
-*                disabled prior to calling this function.
-*
-* Postconditions: Global interrupts disabled.
-*/
-static inline void sem_block_if_empty(semaphore sem);
-
-/*
 * megos_new_sem(usnigned int)
 *
 * Allocates a new semaphore. Returns a pointer to it.
