@@ -126,6 +126,11 @@ void megos_sched_timer_set(unsigned int aiMilliseconds)
    sei();
 }
 
+void megos_delay_ns(unsigned int nanoseconds)
+{
+   volatile unsigned long tick_s = nanoseconds*CLOCK_TICKS_PER_NS/3;
+   while(tick_s-- > 0);
+}
 
 unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds)
 {

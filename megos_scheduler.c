@@ -14,7 +14,6 @@
 #include "atmel328P.h"
 #include <stdlib.h>
 
-
 enum mos_task_status
 {
    TASK_READY = 0x1,
@@ -74,16 +73,6 @@ static struct mos_tcb* scheduler_task_clean_child(struct mos_tcb* aptTCB);
 * @Return: The last TCB in the task list.
 */
 static struct mos_tcb* scheduler_get_head_task(void);
-
-/*
-* scheduler_calc_task_mem_size(unsigned int)
-*
-* Calculates the desired memory size by including the memory required
-* to also store a TCB.
-*
-* @Return: The adjusted size that include room for a TCB.
-*/
-static unsigned int scheduler_calc_task_mem_size(unsigned int aiSize);
 
 /*
 * scheduler_initialize_stack(struct mos_tcb* aptTask, mos_task_fn aptFN)
@@ -148,6 +137,21 @@ static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask);
 * @Return: 1 if successful, 0 otherwise.
 */
 static unsigned char scheduler_find_task(unsigned int aiTask, struct mos_tcb** rStruct);
+
+/*
+* scheduler_find_task(unsigned int, struct mos_tcb**, struct mos_tcb**)
+*
+* Tries to find the task with the input ID. If successful, the task is returned
+* in the rStruct and its parent is returned in rParent
+*
+* @Param aiTask: Task to find.
+* @Param rStruct: Return value if successful.
+* @Parem rParent: Parent of rStruct.
+* @Return: 1 if successful, 0 otherwise.
+*/
+static unsigned char scheduler_find_task_with_parent( unsigned int aiTask,
+                                                      struct mos_tcb** rStruct,
+                                                      struct mos_tcb** rParent );
 
 /*
 * scheduler_task_wakeup(unsigned int)
@@ -257,11 +261,6 @@ static struct mos_tcb* scheduler_get_head_task(void)
    return task;
 }
 
-static unsigned int scheduler_calc_task_mem_size(unsigned int aiSize)
-{
-   return aiSize+sizeof(struct mos_tcb);
-}
-
 static void scheduler_initialize_stack(struct mos_tcb* aptTask, mos_task_fn aptFN)
 {
    // Put the cleanup function at the bottom of the stack. When the aptTask returns,
@@ -289,7 +288,7 @@ static struct mos_tcb* scheduler_initialize_tcb(void* aptMemoryStart, mos_task_f
    struct mos_tcb* tcb = aptMemoryStart;
 
    // Point the stack pointer to the highest memory value in the block. The stack grows down.
-   tcb->stack_pointer = aptMemoryStart + scheduler_calc_task_mem_size(aiSize);
+   tcb->stack_pointer = aptMemoryStart + aiSize;
    tcb->status = TASK_INIT;
    tcb->next_task = 0;
    tcb->task_id = task_id_pool++;
@@ -306,7 +305,7 @@ static struct mos_tcb* scheduler_initialize_tcb(void* aptMemoryStart, mos_task_f
 static void* scheduler_allocate_task_memory(unsigned int aiSize)
 {
    // TODO: Implement my own malloc.
-   return malloc(scheduler_calc_task_mem_size(aiSize));
+   return malloc(aiSize);
 }
 
 static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask)
@@ -330,15 +329,26 @@ static struct mos_tcb* scheduler_next_ready_task(struct mos_tcb* apStartTask)
 
 static unsigned char scheduler_find_task(unsigned int aiTask, struct mos_tcb** rStruct)
 {
+   struct mos_tcb* parent;
+   return scheduler_find_task_with_parent(aiTask, rStruct, parent);
+}
+
+static unsigned char scheduler_find_task_with_parent( unsigned int aiTask,
+                                                      struct mos_tcb** rStruct,
+                                                      struct mos_tcb** rParent )
+{
+   struct mos_tcb* parent = &tcb_main;
    struct mos_tcb* next = &tcb_main;
    while(next && next->task_id != aiTask)
    {
+      parent = next;
       next = next->next_task;
    }
 
    if(next)
    {
       *rStruct = next;
+      *rParent = parent;
       return 1;
    }
    else
@@ -415,10 +425,15 @@ static void scheduler_wake_sleeping_tasks_if_time()
 
 unsigned int megos_new_task(mos_task_fn aptTask, unsigned int aiSize)
 {
+   void* memory_block = scheduler_allocate_task_memory(aiSize);
+   return megos_new_task_at(aptTask, memory_block, aiSize);
+}
+
+unsigned int megos_new_task_at(mos_task_fn aptTask, void* aptMem, unsigned int aiSize)
+{
    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
    {
-      void* memory_block = scheduler_allocate_task_memory(aiSize);
-      struct mos_tcb* new_tcb = scheduler_initialize_tcb(memory_block, aptTask, aiSize);
+      struct mos_tcb* new_tcb = scheduler_initialize_tcb(aptMem, aptTask, aiSize);
       return new_tcb->task_id;
    }
    return 0;
@@ -444,7 +459,14 @@ void megos_task_sleep(unsigned int aiMilliseconds)
    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
    {
       current_task->sleep_tick_count = megos_millis_get_ticks(aiMilliseconds);
-      current_task->status = USHRT_MAX == aiMilliseconds ? TASK_WAIT : TASK_SLEEP;
+      if( USHRT_MAX == aiMilliseconds )
+      {
+         current_task->status = TASK_WAIT;
+      }
+      else
+      {
+         current_task->status = TASK_SLEEP;
+      }
       megos_schedule(0);
    }
 }

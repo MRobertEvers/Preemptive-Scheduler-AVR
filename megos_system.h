@@ -10,7 +10,8 @@
 #define MEGOS_SYSTEM_H_
 
 #define CLOCK_FREQUENCY 20000000
-#define CLOCK_TICKS_PER_MS CLOCK_FREQUENCY/1000
+#define CLOCK_TICKS_PER_MS 20000
+#define CLOCK_TICKS_PER_NS 20
 
 /**
 * megos_sched_timer_set(int)
@@ -26,6 +27,9 @@
 *        function also sets the prescaling value.
 */
 void megos_sched_timer_set(unsigned int aiMilliseconds);
+
+
+inline void megos_delay_ns(unsigned int nanoseconds);
 
 unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds);
 

@@ -6,8 +6,10 @@
 */
 
 #include <avr/io.h>
+#include <util/atomic.h>
 #include <avr/interrupt.h>
 #include "megos.h"
+#include "megos_8led_driver.h"
 #include "megos_scheduler.h"
 #include "megos_settings.h"
 
@@ -45,48 +47,18 @@ void test_task_two(void)
    }
 }
 
-void tick(void)
-{
-   PORTB |= (1 << PORTB4);
-   megos_task_sleep(250);
-   PORTB &= !(1 << PORTB4);
-   megos_task_sleep(250);
-}
-
-void SixSixDriverTest(void)
-{
-   DDRB |= 0x18;
-   DDRD |= 0xFF;
-   unsigned char test[] = { 0x1, 0x2, 0xFF, 0, 0, 0 };
-   // 4 is cld
-   // 3 is ser input.
-   PORTB = 0;
-   int Row = 6;
-   int AllRow = 8;
-   while(1)
-   {
-      PORTB = (1 << PORTB3);
-      tick();
-      PORTB &= !(1 << PORTB3);
-      for(int i = 0; i < Row; i++)
-      {
-         PORTD = (test[i] << PORTD2); //| (1 << PORTD2);//test[i] << PORTD2;
-         // Put the row out simultaneously
-         tick();
-      }
-      PORTD = 0;
-      for(int i = Row; i < AllRow; i++)
-      {
-         tick();
-      }
-   }
-}
-
 int main(void)
 {
    megos_init();
-   int i = megos_new_task(&SixSixDriverTest, SCHEDULER_DEFAULT_TASK_SIZE);
-   megos_task_start(i);
+   megos_8led_init();
+   while(1)
+   {
+      for(int i = 0; i < 8; i++)
+      {
+         megos_8led_display_set_row(i, 0xFF);
+      }
+      megos_8led_draw_refresh();
+   }
    /*
    int i = megos_new_task(&test_task, SCHEDULER_DEFAULT_TASK_SIZE);
    megos_task_start(i);
