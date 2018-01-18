@@ -23,10 +23,13 @@
  ; @param switch: See save. Context that leaves this function.
  ;              : void** two bytes -> low byte r22; high byte r23
  ;
- ; Saves the state of the registers on the stack and then saves the stack
+ ; Saves the state of the registers (for the context switch function) 
+ ; on the stack and then saves the stack
  ; pointer of the current context in address pointed to by argument one,
  ; then loads the stack context starting with the stack pointer stored at
  ; the location pointed to by argument 2.
+ ; Also, note that the interrupt must save the registers. This is a different
+ ; routine
  megos_context_switch:
     ; Save the current context.
 	; The return address is pushed onto the stack just before this function
@@ -122,4 +125,4 @@
 	pop r31
 	pop r0
 	out _SREG, r0
-	reti ; Re-enable interupts (part of reti)
+	ret ; Re-enable interupts (part of reti)

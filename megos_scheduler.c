@@ -20,6 +20,7 @@ enum mos_task_status
    TASK_WAIT = 0x2,
    TASK_DONE = 0x4,
    TASK_SLEEP = 0x8,
+   TASK_SEMAPHORE = 0x10,
    TASK_INIT = 0x0
 };
 
@@ -492,8 +493,9 @@ void megos_schedule(unsigned char abIsInterrupt)
    }
 }
 
+
 void megos_schedule_control_init(void)
 {
-   cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
-   megos_task_start(cleanup_task);
+   //cleanup_task = megos_new_task(&scheduler_cleanup_tasks, 196);
+   //megos_task_start(cleanup_task);
 }

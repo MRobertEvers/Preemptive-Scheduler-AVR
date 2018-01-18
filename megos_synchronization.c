@@ -21,14 +21,14 @@
 #include "megos_synchronization.h"
 #define MAX_SEMAPHORES 10
 
-static inline void sem_block_if_neg(semaphore sem)
+static inline void sem_block_if_empty(semaphore sem)
 {
    // Interrupts must have already been disabled,
    // otherwise 2 sems could decrement, then compare and both fail.
    while(1)
    {
       cli();
-      if(*sem >= 0)
+      if(*sem > 0)
       {
          // We don't need to enabled interrupts here.
          // The outer function MUST enable interrupts if
@@ -39,6 +39,10 @@ static inline void sem_block_if_neg(semaphore sem)
       // If we are blocking, then interrupts are the
       // only way out of this loop.
       sei();
+
+      // Give time for the interrupt to occur.
+      volatile int i = 4;
+      while(i--);
    }
 }
 
@@ -77,7 +81,18 @@ void megos_sem_P(semaphore sem)
 {
    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
    {
+      sem_block_if_empty(sem);
       (*sem)--;
-      sem_block_if_neg(sem);
+      
+   }
+}
+
+void megos_sem_P_stop_starve(semaphore sem, semaphore stop_sem)
+{
+   ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+   {
+      megos_sem_P(stop_sem);
+      megos_sem_P(sem);
+      megos_sem_V(stop_sem);
    }
 }

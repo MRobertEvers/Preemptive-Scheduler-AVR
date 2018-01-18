@@ -19,6 +19,7 @@
  static unsigned char* write_buffer = display_buffer_back;
  static int* buffer_sem = 0;
  static int* write_buffer_sem = 0;
+ static int* stop_starve_sem = 0;
 
  static void driver_8led_flip(void);
 
@@ -35,7 +36,7 @@
 
  static void driver_8led_flip(void)
  {
-   megos_sem_P(buffer_sem);
+   megos_sem_P_stop_starve(buffer_sem, stop_starve_sem);
    megos_sem_P(write_buffer_sem);
    if( display_buffer == display_buffer_front )
    {
@@ -55,18 +56,17 @@
  {
     while(1)
     {
-      megos_sem_P(buffer_sem);
+      megos_sem_P_stop_starve(buffer_sem, stop_starve_sem);
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
       {
-
          driver_8led_start_sweep();
          for(int i = 0; i < 8; i++)
          {
             PORTD = (display_buffer[i] << PORTD2);
             driver_8led_shift();
          }
+         megos_sem_V(buffer_sem);
       }
-      megos_sem_V(buffer_sem);
     }
  }
 
@@ -91,6 +91,7 @@
    DDRD |= 0xFF;
    buffer_sem = megos_new_sem(1);
    write_buffer_sem = megos_new_sem(1);
+   stop_starve_sem = megos_new_sem(1);
    int iTask = megos_new_task_at(&driver_8led_draw, draw_task_memory, SCHEDULER_DEFAULT_TASK_SIZE);
    megos_task_start(iTask);
  }

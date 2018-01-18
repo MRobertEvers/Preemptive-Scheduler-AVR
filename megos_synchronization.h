@@ -9,7 +9,7 @@
 #ifndef MEGOS_SYNCHRONIZATION_H_
 #define MEGOS_SYNCHRONIZATION_H_
 
-typedef int* semaphore;
+typedef signed int* semaphore;
 
 /*
 * sem_block_if_neg(semaphore)
@@ -25,7 +25,7 @@ typedef int* semaphore;
 *
 * Postconditions: Global interrupts disabled.
 */
-static inline void sem_block_if_neg(semaphore sem);
+static inline void sem_block_if_empty(semaphore sem);
 
 /*
 * megos_new_sem(usnigned int)
@@ -62,6 +62,8 @@ void megos_sem_V(semaphore sem);
 * @Param sem: Semaphore to decrement.
 */
 void megos_sem_P(semaphore sem);
+
+void megos_sem_P_stop_starve(semaphore sem, semaphore stop_sem);
 
 
 #endif /* MEGOS_SYNCHRONIZATION_H_ */
