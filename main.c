@@ -45,15 +45,55 @@ void test_task_two(void)
    }
 }
 
+void tick(void)
+{
+   PORTB |= (1 << PORTB4);
+   megos_task_sleep(250);
+   PORTB &= !(1 << PORTB4);
+   megos_task_sleep(250);
+}
+
+void SixSixDriverTest(void)
+{
+   DDRB |= 0x18;
+   DDRD |= 0xFF;
+   unsigned char test[] = { 0x1, 0x2, 0xFF, 0, 0, 0 };
+   // 4 is cld
+   // 3 is ser input.
+   PORTB = 0;
+   int Row = 6;
+   int AllRow = 8;
+   while(1)
+   {
+      PORTB = (1 << PORTB3);
+      tick();
+      PORTB &= !(1 << PORTB3);
+      for(int i = 0; i < Row; i++)
+      {
+         PORTD = (test[i] << PORTD2); //| (1 << PORTD2);//test[i] << PORTD2;
+         // Put the row out simultaneously
+         tick();
+      }
+      PORTD = 0;
+      for(int i = Row; i < AllRow; i++)
+      {
+         tick();
+      }
+   }
+}
+
 int main(void)
 {
    megos_init();
+   int i = megos_new_task(&SixSixDriverTest, SCHEDULER_DEFAULT_TASK_SIZE);
+   megos_task_start(i);
+   /*
    int i = megos_new_task(&test_task, SCHEDULER_DEFAULT_TASK_SIZE);
    megos_task_start(i);
 
    i = megos_new_task(&test_task_two, SCHEDULER_DEFAULT_TASK_SIZE);
    megos_task_start(i);
-
+   */
    while (1);
 }
 
