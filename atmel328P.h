@@ -10,7 +10,7 @@
 #define ATMEL328P_H_
 
 // See manual 12.3.
-#define ATMEL328P_STACK_START 0x08FF
+#define ATMEL328P_STACK_START (void*)0x08FF
 
 
 

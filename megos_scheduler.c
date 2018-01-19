@@ -9,10 +9,11 @@
 #include <limits.h>
 #include <avr/interrupt.h>
 #include <util/atomic.h>
+#include <stdlib.h>
 #include "megos_system.h"
 #include "megos_scheduler.h"
+#include "megos_contexts.h"
 #include "atmel328P.h"
-#include <stdlib.h>
 
 enum mos_task_status
 {

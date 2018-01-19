@@ -47,14 +47,14 @@
  * Note: This register exists in the configuration required to use this
  * driver. It must be present for this driver to work.
  */
- static void driver_8led_start_sweep(void);
+ static inline void driver_8led_start_sweep(void);
 
  /*
  * driver_8led_shift(void)
  *
  * Cycles the shift register clock. Shifts each bit in the register.
  */
- static void driver_8led_shift(void);
+ static inline void driver_8led_shift(void);
 
  static void driver_8led_flip(void)
  {

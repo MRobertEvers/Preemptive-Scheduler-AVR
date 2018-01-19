@@ -30,6 +30,7 @@
  ; the location pointed to by argument 2.
  ; Also, note that the interrupt must save the registers. This is a different
  ; routine
+ ; Megos_contexts.h contains c declaration of this functions
  megos_context_switch:
     ; Save the current context.
 	; The return address is pushed onto the stack just before this function

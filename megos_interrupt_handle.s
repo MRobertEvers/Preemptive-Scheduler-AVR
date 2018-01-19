@@ -6,10 +6,14 @@
  *  Author: Matthew
  */ 
 
-  .global megos_schedule
   .global megos_interrupt_schedule
- 
-  
+
+ ; void megos_interrupt_schedule(void)
+ ;
+ ; Pushes each of the registers onto the stack before calling
+ ; the C interrupt handler. This is because the interrupt does
+ ; not automatically do so for all registers.
+ ; Megos_contexts.h contains c declaration of this functions
  megos_interrupt_schedule:
    push r31 ;Save all the registers from before the interrupt
 	push r30

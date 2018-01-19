@@ -12,6 +12,7 @@
 #include "megos_8led_driver.h"
 #include "megos_scheduler.h"
 #include "megos_settings.h"
+#include "megos_contexts.h"
 
 int main(void)
 {
