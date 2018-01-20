@@ -74,14 +74,14 @@ static void sched_timer_enable(void)
    TIMSK0 |= (1 << OCIE0A);
 }
 
-void megos_sched_timer_set(unsigned int aiMilliseconds)
+void megos_sched_timer_set(unsigned int aiBursts)
 {
    cli();
    sched_timer_enable();
    sched_timer_enable_CTC();
    
-   system_rate = aiMilliseconds;
-   int iTicks = CLOCK_TICKS_PER_MS * aiMilliseconds;
+   system_rate = aiBursts;
+   int iTicks = CLOCK_TICKS_PER_BURST * aiBursts;
 
    // Clear the Pre-Scaler bits. See atmel manual 19.9.2
    TCCR0B &= (0xF8);
@@ -124,12 +124,6 @@ void megos_sched_timer_set(unsigned int aiMilliseconds)
 
    sched_timer_set_ticks(iTicks & 0xFF);
    sei();
-}
-
-void megos_delay_ns(unsigned int nanoseconds)
-{
-   volatile unsigned long tick_s = nanoseconds*CLOCK_TICKS_PER_NS/3;
-   while(tick_s-- > 0);
 }
 
 unsigned int megos_millis_get_ticks(unsigned int aiMilliseconds)

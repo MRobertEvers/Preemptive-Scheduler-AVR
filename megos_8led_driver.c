@@ -102,9 +102,9 @@
  static void driver_8led_shift(void)
  {
     PORTB |= (1 << PORTB4);
-    megos_delay_ns(10);
+    megos_delay_mus(10);
     PORTB &= !(1 << PORTB4);
-    megos_delay_ns(10);
+    megos_delay_mus(10);
  }
 
  void megos_8led_init(void)

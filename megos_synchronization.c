@@ -61,7 +61,7 @@ static void sem_block_if_empty(semaphore sem)
       sei();
 
       // Give time for the interrupt to occur.
-      volatile int i = 4;
+      volatile int i = 1;
       while(i--);
    }
 }
