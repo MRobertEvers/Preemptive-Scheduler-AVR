@@ -47,14 +47,20 @@
  * Note: This register exists in the configuration required to use this
  * driver. It must be present for this driver to work.
  */
- static inline void driver_8led_start_sweep(void);
+ static inline void driver_8led_start_row_sweep(void);
 
  /*
  * driver_8led_shift(void)
  *
  * Cycles the shift register clock. Shifts each bit in the register.
  */
- static inline void driver_8led_shift(void);
+ static inline void driver_8led_shift_row(void);
+
+ static inline void driver_8led_set_column(unsigned char aiRow);
+
+ static inline void driver_8led_shift_column(void);
+
+ static inline void driver_8led_show_column(void);
 
  static void driver_8led_flip(void)
  {
@@ -81,30 +87,57 @@
       megos_sem_P_stop_starve(buffer_sem, stop_starve_sem);
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
       {
-         driver_8led_start_sweep();
+         driver_8led_start_row_sweep();
          for(int i = 0; i < 8; i++)
          {
-            PORTD = (display_buffer[i] << PORTD2);
-            driver_8led_shift();
+            driver_8led_set_column(display_buffer[i]);
+            driver_8led_shift_row();
          }
          megos_sem_V(buffer_sem);
       }
     }
  }
 
- static void driver_8led_start_sweep(void)
+ static void driver_8led_start_row_sweep(void)
  {
    PORTB = (1 << PORTB3);
-   driver_8led_shift();
+   driver_8led_shift_row();
    PORTB &= !(1 << PORTB3);
  }
 
- static void driver_8led_shift(void)
+ static void driver_8led_shift_row(void)
  {
     PORTB |= (1 << PORTB4);
-    megos_delay_mus(10);
+    megos_delay_mus(100);
     PORTB &= !(1 << PORTB4);
-    megos_delay_mus(10);
+    megos_delay_mus(100);
+ }
+
+ static void driver_8led_set_column(unsigned char aiRow)
+ {
+   
+   for(int i = 0; i < 8; i++)
+   { 
+      PORTD = ((0x1 & (aiRow>>(7-i))) << PORTD3);
+      driver_8led_shift_column();
+   }
+   driver_8led_show_column();
+ }
+
+static void driver_8led_shift_column(void)
+{
+   PORTD |= (1 << PORTD4);
+   megos_delay_mus(100);
+   PORTD &= !(1 << PORTD4);
+   megos_delay_mus(100);
+}
+
+ static void driver_8led_show_column(void)
+ {
+    PORTD = (1 << PORTD2);
+    megos_delay_mus(100);
+    PORTD &= !(1 << PORTD2);
+    megos_delay_mus(100);
  }
 
  void megos_8led_init(void)

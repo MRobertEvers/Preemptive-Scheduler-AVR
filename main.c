@@ -22,7 +22,7 @@ int main(void)
    {
       for(int i = 0; i < 8; i++)
       {
-         megos_8led_display_set_row(i, i);
+         megos_8led_display_set_row(i, 1<<i);
       }
       megos_8led_draw_refresh();
    }
