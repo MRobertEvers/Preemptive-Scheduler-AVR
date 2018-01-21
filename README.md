@@ -27,15 +27,15 @@ Of course, the GND and 5V pins are used to provide the circuit.
 One possible setup includes the use of transistor arrays (or just 8 transistors) to turn the output from the ground source shift register into a ground source for the LED matrix.
 (i.e. The base of the transistor is the output of the shift register, the emitter is the input to the LED matrix expecting ground, and the collector is ground)  
 
-For documentation of my own setup, I am using the KWM-30881CWB 8x8 LED matrix. Its pinouts are  
-(From the top of the matrix with the 'nub' and serial number facing down)
+For documentation of my own setup, I am using the KWM-30881CWB 8x8 LED matrix from Adafruit. Its pinouts are  
+(From the top of the matrix with the 'nub' and serial number facing down)  
 0  1  2  3  4  5  6 7  
 15 14 13 12 11 10 9 8  
 0: C7  
 1: C6  
 2: R1  
 3: C0  
-4: R3
+4: R3  
 5: C5  
 6: C3  
 7: R0  
