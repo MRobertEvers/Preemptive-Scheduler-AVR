@@ -57,19 +57,19 @@
  static inline void driver_8led_shift_row(void);
 
  /*
- * driver_8led_set_column(unsigned char aiRow)
+ * driver_8led_set_row(unsigned char aiRow)
  *
- * Displays the 8 bit column that intersects with the current
- * row.
+ * Sets each of the columns in the current row equal
+ * to the bits in aiRow.
  */
- static inline void driver_8led_set_column(unsigned char aiRow);
+ static inline void driver_8led_set_row(unsigned char aiRow);
 
  /*
  *
  */
  static inline void driver_8led_shift_column(void);
 
- static inline void driver_8led_show_column(void);
+ static inline void driver_8led_show_row(void);
 
  static void driver_8led_flip(void)
  {
@@ -96,12 +96,14 @@
       megos_sem_P_stop_starve(buffer_sem, stop_starve_sem);
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
       {
-         driver_8led_set_column(display_buffer[0]);
          driver_8led_start_row_sweep();
+         driver_8led_set_row(display_buffer[0]);
+         driver_8led_set_row(0);
          for(int i = 1; i < 8; i++)
          {
-            driver_8led_set_column(display_buffer[i]);
             driver_8led_shift_row();
+            driver_8led_set_row(display_buffer[i]);
+            driver_8led_set_row(0);
          }
          megos_sem_V(buffer_sem);
       }
@@ -123,7 +125,7 @@
     megos_delay_mus(10);
  }
 
- static void driver_8led_set_column(unsigned char aiRow)
+ static void driver_8led_set_row(unsigned char aiRow)
  {
    
    for(int i = 0; i < 8; i++)
@@ -131,7 +133,7 @@
       PORTD = ((0x1 & (aiRow>>(7-i))) << PORTD3);
       driver_8led_shift_column();
    }
-   driver_8led_show_column();
+   driver_8led_show_row();
  }
 
 static void driver_8led_shift_column(void)
@@ -142,7 +144,7 @@ static void driver_8led_shift_column(void)
    megos_delay_mus(10);
 }
 
- static void driver_8led_show_column(void)
+ static void driver_8led_show_row(void)
  {
     PORTD = (1 << PORTD2);
     megos_delay_mus(10);
