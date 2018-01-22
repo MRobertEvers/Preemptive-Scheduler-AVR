@@ -65,10 +65,20 @@
  static inline void driver_8led_set_row(unsigned char aiRow);
 
  /*
+ * driver_8led_shift_column(void)
  *
+ * Used to load the column register with the correct value
+ * in each bit. Shifts all bits in the column register one column
+ * down.
  */
  static inline void driver_8led_shift_column(void);
 
+ /*
+ * driver_8led_show_row(void)
+ *
+ * Latches the column register so each of the columns are
+ * set to the value that was loaded in the set row function.
+ */
  static inline void driver_8led_show_row(void);
 
  static void driver_8led_flip(void)

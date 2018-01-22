@@ -19,6 +19,7 @@
  */
 #include <util/atomic.h>
 #include "megos_synchronization.h"
+#include "megos_system.h"
 #define MAX_SEMAPHORES 10
 
 // TODO: Avoid static allocation
@@ -60,9 +61,8 @@ static void sem_block_if_empty(semaphore sem)
       // only way out of this loop.
       sei();
 
-      // Give time for the interrupt to occur.
-      volatile int i = 1;
-      while(i--);
+      // Give time for the interrupt to occur. At least 4 cycles.
+      megos_delay_mus(1);
    }
 }
 
